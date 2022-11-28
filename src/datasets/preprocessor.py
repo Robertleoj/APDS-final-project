@@ -12,8 +12,12 @@ class Preprocessor:
         
         seg_arr = read_nii(seg_file)
         vol_arr = read_nii(vol_file)
+        
 
         return vol_arr, seg_arr
-        
+
+# turn into tensors
+# normalize
+# handle differing sizes
 
     

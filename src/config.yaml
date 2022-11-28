@@ -7,4 +7,7 @@ data:
     train: 100
     val: 10
     test: 20
+  norm:
+    mean: -650
+    std: 
 

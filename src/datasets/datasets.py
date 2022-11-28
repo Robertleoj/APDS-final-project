@@ -122,10 +122,7 @@ class Data:
 
 # Need to
 # import scans
-# open as array (using nib)
-# turn into tensors
-# normalize
-# handle differing sizes
+
 # cache
 # train, test, val split
 # make pytorch datasets
