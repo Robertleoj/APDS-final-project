@@ -1,4 +1,4 @@
-from utils import read_nii
+from .utils import read_nii
 
 
 class Preprocessor:

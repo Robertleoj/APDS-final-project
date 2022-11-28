@@ -2,4 +2,9 @@ data:
   unzipped_path: /media/bigbrainman/DataDrive/data/LITS17/unzipped
   cache_dir: /media/bigbrainman/DataDrive/data/LITS17/cache
   zipped_path: /media/bigbrainman/DataDrive/data/LITS17
+  split_path: datasets/split.json
+  split:
+    train: 100
+    val: 10
+    test: 20
 

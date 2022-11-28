@@ -1,16 +1,16 @@
-from preprocessor import Preprocessor
+from .preprocessor import Preprocessor
 
 class Cacher:
     def __init__(self, *,
         train_indices, 
         val_indices, 
-        test_incides, 
+        test_indices, 
         data_path
     ):
 
         self.train_indices = train_indices
         self.val_indices = val_indices
-        self.test_indices = test_incides
+        self.test_indices = test_indices
         self.data_path = data_path
 
     def make_cache(self):
