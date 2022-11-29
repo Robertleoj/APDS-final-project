@@ -107,9 +107,15 @@ class Cacher:
     def nuke(self):
         nuke(self.cache_path)
 
-    def __process_and_save(self, which:WhichSplit, sample_idx, preprocessor):
+    # def __process_and_save(self, which:WhichSplit, sample_idx, preprocessor):
+    #     dp = preprocessor.process(sample_idx)
+    #     self.__save_sample(dp, which, sample_idx)
+    def process_and_save(self, args):
+
+        which, sample_idx, preprocessor = args
         dp = preprocessor.process(sample_idx)
         self.__save_sample(dp, which, sample_idx)
+
 
 
     
@@ -133,13 +139,13 @@ class Cacher:
         ):
             print(WhichSplit.get_name(kind))
 
-            # args = [(kind, i, preprocessor) for i in indices]
+            args = [(kind, i, preprocessor) for i in indices]
 
-            for i in tqdm(indices):
-                self.__process_and_save(kind, i, preprocessor)
+            # for i in tqdm(indices):
+            #     self.__process_and_save(kind, i, preprocessor)
 
-            # with Pool(cpu_count()) as p:
-                # p.map(self.process_and_save, args)
+            with Pool(min(cpu_count(), 4)) as p:
+                p.map(self.process_and_save, args)
 
 
 

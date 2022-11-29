@@ -25,3 +25,8 @@ Unet works as usual, with one difference. At the end, we need to output a tensor
 We can then finally concatenate the predicted masks.
 
 If scan depth is not evenly divisible by $D$, we ignore the remainder at the bottom of the scan.
+
+
+
+#Stuff to do next:
+    Datasets, Dataloaders, Model 
