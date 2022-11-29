@@ -13,10 +13,10 @@ def get_scan_file_paths(data_path):
 
 
 class Data:
-    def __init__(self, data_config):
-        self.config = data_config
+    def __init__(self, config, nuke_cache=False):
+        self.config = config
 
-        if self.__check_cache():
+        if  not nuke_cache and self.__check_cache():
             return
         else:
             self.__make_cache()
@@ -38,10 +38,10 @@ class Data:
         train_indices, val_indices, test_indices = self.__get_split_indices()
 
         cacher = Cacher(
+            config=self.config,
             train_indices=train_indices, 
             val_indices=val_indices, 
             test_indices=test_indices, 
-            data_path=self.config['unzipped_path']
         )
 
         cacher.make_cache()
