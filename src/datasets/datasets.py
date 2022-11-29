@@ -44,6 +44,8 @@ class Data:
             test_indices=test_indices, 
         )
 
+        cacher.nuke()
+
         cacher.make_cache()
 
     def __get_split_indices(self):

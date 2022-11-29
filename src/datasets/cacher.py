@@ -6,6 +6,8 @@ from .utils import DataPoint
 from tqdm import tqdm
 import shutil
 from .utils import nuke
+from multiprocessing import Pool, cpu_count
+
 
 
 class WhichSplit(Enum):
@@ -57,13 +59,13 @@ class Cacher:
 
         folder_path = self.cache_path + '/' + postfix 
 
-        file_name = f"{'seg' if is_seg else 'rem' }_{sample_idx}_{slice_idx}.pickle"
+        file_name = f"{'seg' if is_seg else 'vol' }_{sample_idx}_{slice_idx}.pickle"
 
         return folder_path + '/' + file_name
 
     def __save_sample(self, dp:DataPoint, which:WhichSplit, sample_idx: int):
         
-        slice_list = reversed(dp.slice_list)
+        slice_list = dp.slice_list
         
         for vol_slice, seg_slice, slice_index, tensor_idx in slice_list:
 
@@ -95,7 +97,7 @@ class Cacher:
             which=which,
             slice_idx='rem',
             sample_idx=sample_idx,
-            is_seg=True
+            is_seg=False
         )
 
         torch.save(obj=dp.rem_seg, f=segrem_fpath)
@@ -103,8 +105,13 @@ class Cacher:
 
 
     def nuke(self):
-        if input("deleting " + self.cache_path) == 'y':
-            nuke(self.cache_path)
+        nuke(self.cache_path)
+
+    def __process_and_save(self, which:WhichSplit, sample_idx, preprocessor):
+        dp = preprocessor.process(sample_idx)
+        self.__save_sample(dp, which, sample_idx)
+
+
     
     def make_cache(self):
         # loop through train, val and test indices
@@ -126,12 +133,13 @@ class Cacher:
         ):
             print(WhichSplit.get_name(kind))
 
-
+            # args = [(kind, i, preprocessor) for i in indices]
 
             for i in tqdm(indices):
-                dp = preprocessor.process(i)
-                self.__save_sample(dp, kind, i)
+                self.__process_and_save(kind, i, preprocessor)
 
-            print()
+            # with Pool(cpu_count()) as p:
+                # p.map(self.process_and_save, args)
+
 
 

@@ -16,13 +16,21 @@ class Preprocessor_2p5D:
         seg_file = f"{self.data_path}/segmentation-{scan_index}.nii"
         vol_file = f"{self.data_path}/volume-{scan_index}.nii"
         
-        seg_arr = torch.tensor(read_nii(seg_file))
-        vol_arr = torch.tensor(read_nii(vol_file))
+        seg_arr = torch.tensor(read_nii(seg_file), dtype=torch.int8)
+        vol_arr = read_nii(vol_file)
 
-        full_vol_arr = vol_arr.clone()
-        full_seg_arr = seg_arr.clone()
+
+        # print(seg_arr.shape)
+        # print(vol_arr.shape)
+
+
+        # full_vol_arr = vol_arr.clone()
+        # full_seg_arr = seg_arr.clone()
 
         vol_arr = self.__normalize(vol_arr)
+
+        vol_arr = torch.tensor(vol_arr, dtype=torch.float16)
+
 
 
         slice_list = []
@@ -34,9 +42,10 @@ class Preprocessor_2p5D:
 
             # slice_number = torch.Size(self.slice_number)
 
-            vol_slice = vol_arr[:, :, -self.slice_number:]
-            seg_slice = seg_arr[:, :, -self.slice_number:]
+            vol_slice = vol_arr[:, :, -self.slice_number:].clone()
+            seg_slice = seg_arr[:, :, -self.slice_number:].clone()
 
+            # if slice_idx == 0:
             vol_arr = vol_arr[:, :, :-self.slice_number]
             seg_arr = seg_arr[:, :, :-self.slice_number]
 
@@ -45,11 +54,11 @@ class Preprocessor_2p5D:
             slice_idx += 1
 
         dp = DataPoint(
-            full_vol=full_vol_arr,
-            full_seg=full_seg_arr,
+            full_vol=None,#full_vol_arr,
+            full_seg=None,#full_seg_arr,
             slice_list=slice_list,
-            rem_vol=vol_arr,
-            rem_seg=seg_arr
+            rem_vol=vol_arr.clone(),
+            rem_seg=seg_arr.clone()
         )
 
         return dp
