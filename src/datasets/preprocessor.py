@@ -42,8 +42,9 @@ class Preprocessor_2p5D:
 
             # slice_number = torch.Size(self.slice_number)
 
-            vol_slice = vol_arr[:, :, -self.slice_number:].clone()
-            seg_slice = seg_arr[:, :, -self.slice_number:].clone()
+            vol_slice = vol_arr[:, :, -self.slice_number:].clone().permute(2, 0, 1)
+
+            seg_slice = seg_arr[:, :, -self.slice_number:].clone().permute(2, 0, 1)
 
             # if slice_idx == 0:
             vol_arr = vol_arr[:, :, :-self.slice_number]
@@ -57,8 +58,8 @@ class Preprocessor_2p5D:
             full_vol=None,#full_vol_arr,
             full_seg=None,#full_seg_arr,
             slice_list=slice_list,
-            rem_vol=vol_arr.clone(),
-            rem_seg=seg_arr.clone()
+            rem_vol=vol_arr.clone().permute(2, 0, 1),
+            rem_seg=seg_arr.clone().permute(2, 0, 1)
         )
 
         return dp

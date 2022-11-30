@@ -30,3 +30,19 @@ If scan depth is not evenly divisible by $D$, we ignore the remainder at the bot
 
 #Stuff to do next:
     Datasets, Dataloaders, Model 
+
+
+# Model
+
+## 2.5D Unet
+
+Unet, ResNet blocks as a backbone, attention after every Resnet block
+
+# nov 30 next steps
+Remake cache
+Incomplete layer:
+* attn layers
+* bottom
+* maybe more
+
+Rebalance dataset sampling

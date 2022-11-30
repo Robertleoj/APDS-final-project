@@ -1,7 +1,9 @@
 import numpy as np
 # from ..load_config import load_config
 from glob import glob
+from torch.utils.data import Dataset, DataLoader
 from .cacher import Cacher
+import torch
 import random
 import json
 import os
@@ -10,6 +12,26 @@ import os
 
 def get_scan_file_paths(data_path):
     return glob(f"{data_path}/*.nii")
+
+class Dataset_2p5D(Dataset):
+    def __init__(self, cache_path):
+
+        seg_fpaths = sorted(glob(f"{cache_path}/seg*[!rem].pickle"))
+        vol_fpaths = sorted(glob(f"{cache_path}/vol*[!rem].pickle"))
+
+        self.pairs = list(zip(vol_fpaths, seg_fpaths))
+
+
+    def __len__(self):
+        return len(self.pairs)
+
+    def __getitem__(self, idx):
+        vol_path, seg_path = self.pairs[idx]
+
+        vol = torch.load(vol_path)
+        seg = torch.load(seg_path)
+
+        return vol, seg
 
 
 class Data:
@@ -22,13 +44,19 @@ class Data:
             self.__make_cache()
 
     def get_train(self):
-        pass
+        return Dataset_2p5D(
+            f"{self.config['cache_dir']}/train"
+        )
 
     def get_val(self):
-        pass
+        return Dataset_2p5D(
+            f"{self.config['cache_dir']}/val"
+        )
 
     def get_test(self):
-        pass
+        return Dataset_2p5D(
+            f"{self.config['cache_dir']}/test"
+        )
 
     def __check_cache(self):
         cache_dir = self.config['cache_dir']
