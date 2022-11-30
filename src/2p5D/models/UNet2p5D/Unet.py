@@ -154,7 +154,7 @@ class Encoder(nn.Module):
             block = BackboneBlock(dim=d, n_res_blocks=n_res_blocks)
             self.bb_blocks.append(block)
 
-            if d == dims[0] and False:
+            if d == dims[0]:
                 attn = nn.Identity()
             else:
                 attn = LinearAttention(
@@ -202,7 +202,7 @@ class Decoder(nn.Module):
             
             self.bb_blocks.append(block)
 
-            if d == dims[-1] and False:
+            if d == dims[-1]:
                 attn = nn.Identity()
             else:
                 attn = LinearAttention(
@@ -239,7 +239,8 @@ class UNetBottom(nn.Module):
             dim=dim, n_res_blocks=n_res_blocks
         )
 
-        self.attn = Attention(
+        # self.attn = Attention(
+        self.attn = LinearAttention(
             dim=dim, 
             heads=attn_heads, 
             dim_head=attn_head_dim
@@ -264,7 +265,7 @@ class DimensionAdder(nn.Module):
 
     def forward(self, x: torch.Tensor):
         x = self.projection(x)
-        x = rearrange(x, 'b (d c) w h -> b d w h c', c=self.n_classes)
+        x = rearrange(x, 'b (d c) w h -> b c d w h', c=self.n_classes)
         return x
 
 class Unet2p5D(nn.Module):

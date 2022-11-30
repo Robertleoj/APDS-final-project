@@ -18,8 +18,11 @@ img_size: 512
 clip_lower: -45
 clip_upper: 105
 
+optimizer: adam
 
-n_res_blocks: 3
+n_res_blocks: 2
+
+batch_size: 8
 
 n_classes: 3
 
@@ -28,7 +31,12 @@ dim_mults:
   - 2
   - 4
   - 8
-  - 16
+  # - 16
+
+mask_classes:
+  empty: 0
+  liver: 1
+  cancer: 2
 
 attn_heads: 4
 
