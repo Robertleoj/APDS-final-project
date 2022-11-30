@@ -148,16 +148,21 @@ class Encoder(nn.Module):
         self.attentions = nn.ModuleList([])
         self.downsamples = nn.ModuleList([])
 
+
         for d, ds in zip(dims, dims[1:]):
 
             block = BackboneBlock(dim=d, n_res_blocks=n_res_blocks)
             self.bb_blocks.append(block)
 
-            attn = LinearAttention(
-                dim=d, 
-                heads=attn_heads, 
-                dim_head=attn_head_dim
-            )
+            if d == dims[0] and False:
+                attn = nn.Identity()
+            else:
+                attn = LinearAttention(
+                    dim=d, 
+                    heads=attn_heads, 
+                    dim_head=attn_head_dim
+                )
+
             self.attentions.append(attn)
 
             downsample = Downsample(dim=d, dim_out=ds)
@@ -197,11 +202,14 @@ class Decoder(nn.Module):
             
             self.bb_blocks.append(block)
 
-            attn = LinearAttention(
-                dim=d, 
-                heads=attn_heads,
-                dim_head=attn_head_dim
-            )
+            if d == dims[-1] and False:
+                attn = nn.Identity()
+            else:
+                attn = LinearAttention(
+                    dim=d, 
+                    heads=attn_heads,
+                    dim_head=attn_head_dim
+                )
 
             self.attentions.append(attn)
 
@@ -230,6 +238,7 @@ class UNetBottom(nn.Module):
         self.backbone_block = BackboneBlock(
             dim=dim, n_res_blocks=n_res_blocks
         )
+
         self.attn = Attention(
             dim=dim, 
             heads=attn_heads, 

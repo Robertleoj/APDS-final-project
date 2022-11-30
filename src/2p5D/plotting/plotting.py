@@ -24,8 +24,8 @@ def make_visual(imgs_t, segmentations):
     plt.subplots_adjust(bottom=0.25)
     idx0 = 0
 
-    imgs_t = imgs_t.permute(2, 0, 1)#.squeeze(0)
-    segmentations = segmentations.permute(2, 0, 1)
+    # imgs_t = imgs_t.permute(2, 0, 1)#.squeeze(0)
+    # segmentations = segmentations.permute(2, 0, 1)
 
     im = plt.imshow(imgs_t[idx0].unsqueeze(0).permute(1, 2, 0).numpy(), cmap='gray')
     seg_img = make_seg_img(segmentations[idx0])

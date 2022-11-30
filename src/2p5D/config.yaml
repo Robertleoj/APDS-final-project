@@ -13,6 +13,12 @@ split:
 
 slice_number: 5
 
+img_size: 512
+
+clip_lower: -45
+clip_upper: 105
+
+
 n_res_blocks: 3
 
 n_classes: 3
@@ -21,6 +27,8 @@ dim_mults:
   - 1
   - 2
   - 4
+  - 8
+  - 16
 
 attn_heads: 4
 
