@@ -40,5 +40,5 @@ mask_classes:
 
 attn_heads: 4
 
-attn_head_dim: 32
+# attn_head_dim: 32
 

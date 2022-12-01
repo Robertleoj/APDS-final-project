@@ -27,7 +27,6 @@ We can then finally concatenate the predicted masks.
 If scan depth is not evenly divisible by $D$, we ignore the remainder at the bottom of the scan.
 
 
-
 #Stuff to do next:
     Datasets, Dataloaders, Model 
 
@@ -46,3 +45,6 @@ Incomplete layer:
 * maybe more
 
 Rebalance dataset sampling
+
+## Possible modifications
+* 

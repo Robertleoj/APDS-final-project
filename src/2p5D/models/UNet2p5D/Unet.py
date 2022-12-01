@@ -20,8 +20,10 @@ def Downsample(dim, dim_out = None):
 
 
 class LinearAttention(nn.Module):
-    def __init__(self, *, dim, heads, dim_head):
+    def __init__(self, *, dim, heads, dim_head=None):
         super().__init__()
+        if dim_head is None:
+            dim_head = dim // heads
         self.scale = dim_head ** -0.5
         self.heads = heads
         hidden_dim = dim_head * heads
@@ -41,7 +43,6 @@ class LinearAttention(nn.Module):
         k = k.softmax(dim = -1)
 
         q = q * self.scale
-        v = v / (h * w)
 
         context = torch.einsum('b h d n, b h e n -> b h d e', k, v)
 
@@ -49,9 +50,14 @@ class LinearAttention(nn.Module):
         out = rearrange(out, 'b h c (x y) -> b (h c) x y', h = self.heads, x = h, y = w)
         return self.to_out(out)
 
+
 class Attention(nn.Module):
-    def __init__(self, *, dim, heads, dim_head):
+    def __init__(self, *, dim, heads, dim_head=None):
         super().__init__()
+
+        if dim_head is None:
+            dim_head = dim // heads
+
         self.scale = dim_head ** -0.5
         self.heads = heads
         hidden_dim = dim_head * heads
@@ -72,6 +78,14 @@ class Attention(nn.Module):
 
         out = rearrange(out, 'b h (x y) d -> b (h d) x y', x = h, y = w)
         return self.to_out(out)
+
+
+class Residual(nn.Module):
+    def __init__(self, layer):
+        self.layer = layer
+
+    def forward(self, x):
+        return self.layer(x) + x
 
 
 class LayerNorm(nn.Module):
@@ -118,12 +132,14 @@ class BackboneBlock(nn.Module):
 
 
         if dim_in is not None:
+
             self.first = nn.Conv2d(
                 dim_in, 
                 dim, 
                 kernel_size=3,
                 padding=1
             )
+
         else:
             self.first = None
 
@@ -141,7 +157,7 @@ class BackboneBlock(nn.Module):
         return self.blocks(x)
 
 class Encoder(nn.Module):
-    def __init__(self, *, dims, n_res_blocks, attn_heads, attn_head_dim):
+    def __init__(self, *, dims, n_res_blocks, attn_heads, attn_head_dim=None):
         super().__init__()
 
         self.bb_blocks = nn.ModuleList([])
@@ -157,11 +173,11 @@ class Encoder(nn.Module):
             if d == dims[0]:
                 attn = nn.Identity()
             else:
-                attn = LinearAttention(
+                attn = Residual(LinearAttention(
                     dim=d, 
                     heads=attn_heads, 
-                    dim_head=attn_head_dim
-                )
+                    # dim_head=attn_head_dim
+                ))
 
             self.attentions.append(attn)
 
@@ -182,7 +198,7 @@ class Encoder(nn.Module):
 
 
 class Decoder(nn.Module):
-    def __init__(self, *, dims, n_res_blocks, attn_heads, attn_head_dim):
+    def __init__(self, *, dims, n_res_blocks, attn_heads, attn_head_dim=None):
         super().__init__()
 
         self.upsamples = nn.ModuleList([])
@@ -205,11 +221,11 @@ class Decoder(nn.Module):
             if d == dims[-1]:
                 attn = nn.Identity()
             else:
-                attn = LinearAttention(
+                attn = Residual(LinearAttention(
                     dim=d, 
                     heads=attn_heads,
-                    dim_head=attn_head_dim
-                )
+                    # dim_head=attn_head_dim
+                ))
 
             self.attentions.append(attn)
 
@@ -233,7 +249,7 @@ class Decoder(nn.Module):
 
 
 class UNetBottom(nn.Module):
-    def __init__(self, *, dim, n_res_blocks, attn_heads, attn_head_dim):
+    def __init__(self, *, dim, n_res_blocks, attn_heads, attn_head_dim=None):
         super().__init__()
         self.backbone_block = BackboneBlock(
             dim=dim, n_res_blocks=n_res_blocks
@@ -274,7 +290,7 @@ class Unet2p5D(nn.Module):
         n_classes,
         dim_mults,
         attn_heads,
-        attn_head_dim,
+        # attn_head_dim,
         n_res_blocks
     ):
         super().__init__()
@@ -285,20 +301,20 @@ class Unet2p5D(nn.Module):
             dims=dims,
             n_res_blocks=n_res_blocks,
             attn_heads=attn_heads,
-            attn_head_dim=attn_head_dim
+            # attn_head_dim=attn_head_dim
         )
 
         self.decoder = Decoder(
             dims=dims,
             n_res_blocks=n_res_blocks,
             attn_heads=attn_heads,
-            attn_head_dim=attn_head_dim
+            # attn_head_dim=attn_head_dim
         )
 
         self.bottom = UNetBottom(
             dim=dims[-1],
             n_res_blocks=n_res_blocks,
-            attn_head_dim=attn_head_dim,
+            # attn_head_dim=attn_head_dim,
             attn_heads=attn_heads
         )
 
