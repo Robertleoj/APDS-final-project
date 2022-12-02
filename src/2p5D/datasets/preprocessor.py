@@ -40,27 +40,30 @@ class Preprocessor_2p5D:
         # print(vol_arr.shape)
 
 
-        # full_vol_arr = vol_arr.clone()
-        # full_seg_arr = seg_arr.clone()
-
-
         vol_arr = self.__normalize(vol_arr)
+
+
+        full_vol_arr = vol_arr.permute(2, 0, 1).clone()
+        full_seg_arr = seg_arr.permute(2, 0, 1).clone()
+
 
         vol_arr = vol_arr.to(dtype=torch.float32)
 
+
         vol_arr = vol_arr.permute(2, 0, 1).flip((0,))
         seg_arr = seg_arr.permute(2, 0, 1).flip((0,))
-
+        
 
         vol_arr_slices = vol_arr.split(self.slice_number)
         seg_arr_slices = seg_arr.split(self.slice_number)
+
 
         vol_arr_slices, vol_rem = self.__get_rem(vol_arr_slices)
         seg_arr_slices, seg_rem = self.__get_rem(seg_arr_slices)
         
         dp = DataPoint(
-            full_vol=None,#full_vol_arr,
-            full_seg=None,#full_seg_arr,
+            full_vol=full_vol_arr,#full_vol_arr,
+            full_seg=full_seg_arr,#full_seg_arr,
             slice_list=list(zip(vol_arr_slices, seg_arr_slices)),
             rem_vol=vol_rem,
             rem_seg=seg_rem

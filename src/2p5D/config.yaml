@@ -1,8 +1,6 @@
-unzipped_path: /media/bigbrainman/DataDrive/data/LITS17/unzipped
+unzipped_path: /home/bigbrainman/APDS-final-project/data/unzipped
 
-cache_dir: /media/bigbrainman/DataDrive/data/LITS17/cache
-
-zipped_path: /media/bigbrainman/DataDrive/data/LITS17
+cache_dir: /home/bigbrainman/APDS-final-project/data/cache
 
 split_path: datasets/split.json
 

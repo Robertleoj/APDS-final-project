@@ -2,6 +2,7 @@ import nibabel as nib
 import numpy as np
 from collections import namedtuple
 from scipy import ndimage
+import json
 import torch
 import shutil
 import os
@@ -84,3 +85,30 @@ def resize(img: torch.Tensor, xy, mode=None):
     img = ndimage.zoom(img, (width_factor, height_factor, depth_factor), order=1, mode=mode)
 
     return torch.tensor(img)
+
+
+def get_split_indices(split_path):
+    
+    with open(split_path, 'r') as f:
+        indices_dict = json.load(f)
+
+        return (
+            indices_dict['train'], 
+            indices_dict['val'], 
+            indices_dict['test']
+        )
+
+
+def liver_min_max(seg: torch.Tensor):
+    """
+    scan is Z x H x W
+    """
+    indices = seg.max(-1).values.max(-1).values.nonzero()
+
+    return indices.min(), indices.max()
+
+
+
+
+
+
