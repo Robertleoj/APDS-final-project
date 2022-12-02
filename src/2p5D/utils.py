@@ -12,7 +12,7 @@ def dice_all(mask1, mask2, mask_classes):
 
 def model_from_config(config):
     return Unet2p5D(
-        dim=config['slice_number'],
+        dim=3,
         n_classes=config['n_classes'],
         dim_mults=config['dim_mults'],
         attn_heads=config['attn_heads'],

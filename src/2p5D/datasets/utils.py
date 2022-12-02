@@ -9,7 +9,7 @@ import os
 
 DataPoint = namedtuple('DataPoint', (
     'full_vol', 'full_seg',
-    'slice_list', 'rem_vol', 'rem_seg'
+    'slice_list',
 ))
 
 def check_orientation(ct_image, ct_arr):

@@ -2,6 +2,7 @@
 from datasets.preprocessor import Preprocessor_2p5D
 from datasets.utils import get_split_indices, liver_min_max
 import torch
+import gc
 import os
 from load_config import load_config 
 
@@ -36,6 +37,11 @@ mins = []
 for scan_idx in tqdm(train_split):
     dp = pre.process(scan_idx)
     _, seg = dp.full_vol, dp.full_seg
+
+    dp = None
+
+    gc.collect()
+
     mn, mx = get_liver_z_pct_bounds(seg)
     maxes.append(mx)
     mins.append(mn)

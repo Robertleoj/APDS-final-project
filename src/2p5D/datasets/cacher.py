@@ -40,9 +40,10 @@ class Cacher:
         self.val_indices = val_indices
         self.test_indices = test_indices
         self.data_path = config['unzipped_path']
-        self.slice_number = config['slice_number']
         self.cache_path = config['cache_dir']
         self.config = config
+
+        os.makedirs(self.cache_path, exist_ok=True)
         
 
     def __get_fpath(self, *,
@@ -86,27 +87,6 @@ class Cacher:
             torch.save(obj=vol_slice.clone(), f=vol_fpath)
             torch.save(obj=seg_slice.clone(), f=seg_fpath)
 
-        if dp.rem_seg is not None:
-            # slices come from same size tensor, so they both have rem or neither
-
-            segrem_fpath = self.__get_fpath(
-                which=which,
-                slice_idx='rem',
-                sample_idx=sample_idx,
-                is_seg=True
-            )
-
-            torch.save(obj=dp.rem_seg.clone(), f=segrem_fpath)
-
-            volrem_fpath = self.__get_fpath(
-                which=which,
-                slice_idx='rem',
-                sample_idx=sample_idx,
-                is_seg=False
-            )
-
-            torch.save(obj=dp.rem_vol.clone(), f=volrem_fpath)
-
 
     def nuke(self):
         nuke(self.cache_path)
@@ -119,8 +99,6 @@ class Cacher:
         which, sample_idx, preprocessor = args
         dp = preprocessor.process(sample_idx)
         self.__save_sample(dp, which, sample_idx)
-
-
 
     
     def make_cache(self):

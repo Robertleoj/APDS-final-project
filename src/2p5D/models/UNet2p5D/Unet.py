@@ -280,23 +280,6 @@ class UNetBottom(nn.Module):
         x = self.backbone_block(x)
         return self.attn(x)
    
-class DimensionAdder(nn.Module):
-    def __init__(self, *, in_dim, out_dim, n_classes):
-        super().__init__()
-
-        self.n_classes = n_classes
-        self.projection = nn.Conv2d(
-            in_dim, 
-            n_classes * out_dim, 
-            kernel_size=3,
-            padding=1
-        )
-
-    def forward(self, x: torch.Tensor):
-        x = self.projection(x)
-        x = rearrange(x, 'b (d c) w h -> b c d w h', c=self.n_classes)
-        return x
-
 class Unet2p5D(nn.Module):
     def __init__(self, *, 
         dim, 
@@ -331,18 +314,11 @@ class Unet2p5D(nn.Module):
             attn_heads=attn_heads
         )
 
-        self.dim_adder = DimensionAdder(
-            n_classes=n_classes,
-            in_dim=dim,
-            out_dim=dim,
-        )
-
     def forward(self, x):
         # x = (x + 200) / (200 + 200)
         x, enc_residuals = self.encoder(x)
         x = self.bottom(x)
         x = self.decoder(x, enc_residuals)
-        x = self.dim_adder(x)
         return x
 
         

@@ -16,20 +16,53 @@ def get_scan_file_paths(data_path):
 class Dataset_2p5D(Dataset):
     def __init__(self, cache_path):
 
-        seg_fpaths = sorted(glob(f"{cache_path}/seg*[!rem].pickle"))
-        vol_fpaths = sorted(glob(f"{cache_path}/vol*[!rem].pickle"))
+        # seg_fpaths = sorted(glob(f"{cache_path}/seg*.pickle"))
+        # vol_fpaths = sorted(glob(f"{cache_path}/vol*.pickle"))
 
-        self.pairs = list(zip(vol_fpaths, seg_fpaths))
+        self.tuples = []
 
+        vol_paths = glob(f"{cache_path}/vol*.pickle")
+
+        indices = [
+            int(p.split('_')[-2]) 
+            for p in vol_paths
+        ]
+
+        for idx in indices:
+            paths = glob(f"{cache_path}/vol_{idx}_*.pickle")
+            slice_indices = [
+                int(p.split('_')[-1].split('.')[0]) 
+                for p in paths
+            ]
+
+            slice_indices = slice_indices[1:-1]
+
+            self.tuples.extend([
+                (idx, slice_idx) 
+                for slice_idx in slice_indices
+            ])
+
+        self.cache_path = cache_path
 
     def __len__(self):
-        return len(self.pairs)
+        return len(self.tuples)
 
     def __getitem__(self, idx):
-        vol_path, seg_path = self.pairs[idx]
 
-        vol = torch.load(vol_path)
-        seg = torch.load(seg_path)
+        scan_idx, slice_idx = self.tuples[idx]
+
+        vol_paths = [
+            f"{self.cache_path}/vol_{scan_idx}_{slice_idx + i}.pickle"
+            for i in (-1, 0, 1)
+        ]
+
+        seg_path = f"{self.cache_path}/seg_{scan_idx}_{slice_idx}.pickle"
+
+        vol = torch.concat(
+            [torch.load(path) for path in vol_paths], dim=0
+        )
+
+        seg =torch.load(seg_path)
 
         return vol, seg
 

@@ -9,10 +9,6 @@ split:
   val: 10
   test: 20
 
-slice_number: 5
-
-img_size: 512
-
 clip_lower: -200
 clip_upper: 200
 
