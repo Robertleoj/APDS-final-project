@@ -20,6 +20,12 @@ def model_from_config(config):
         n_res_blocks=config['n_res_blocks']
     )
 
+def inverse_norm(x,config):
+    low = config['clip_lower']
+    high = config['clip_upper']
+
+    return (x * (high - low) + low)
+
 
 def dice(mask1, mask2, val):
     mask1 = mask1 == val
@@ -29,5 +35,5 @@ def dice(mask1, mask2, val):
 
     denom = mask1.sum() + mask2.sum()
 
-    return 2 * TP / denom
+    return (2 * TP / denom).item()
 

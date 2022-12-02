@@ -15,8 +15,8 @@ slice_number: 5
 
 img_size: 512
 
-clip_lower: -45
-clip_upper: 105
+clip_lower: -200
+clip_upper: 200
 
 optimizer: adam
 
@@ -40,5 +40,5 @@ mask_classes:
 
 attn_heads: 4
 
-# attn_head_dim: 32
+attn_head_dim: 32
 

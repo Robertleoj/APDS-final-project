@@ -38,6 +38,7 @@ class LinearAttention(nn.Module):
         b, c, h, w = x.shape
         qkv = self.to_qkv(x).chunk(3, dim = 1)
         q, k, v = map(lambda t: rearrange(t, 'b (h c) x y -> b h c (x y)', h = self.heads), qkv)
+        # q, k, v = map(lambda t: rearrange(t, 'b (h c) x y -> b h c (x y)', h = self.heads), qkv)
 
         q = q.softmax(dim = -2)
         k = k.softmax(dim = -1)
@@ -82,6 +83,7 @@ class Attention(nn.Module):
 
 class Residual(nn.Module):
     def __init__(self, layer):
+        super().__init__()
         self.layer = layer
 
     def forward(self, x):
@@ -156,6 +158,17 @@ class BackboneBlock(nn.Module):
 
         return self.blocks(x)
 
+class PreNorm(nn.Module):
+    def __init__(self, dim, fn):
+        super().__init__()
+        self.fn = fn
+        self.norm = LayerNorm(dim)
+
+    def forward(self, x):
+        x = self.norm(x)
+        return self.fn(x)
+
+
 class Encoder(nn.Module):
     def __init__(self, *, dims, n_res_blocks, attn_heads, attn_head_dim=None):
         super().__init__()
@@ -173,11 +186,11 @@ class Encoder(nn.Module):
             if d == dims[0]:
                 attn = nn.Identity()
             else:
-                attn = Residual(LinearAttention(
+                attn = Residual(PreNorm(d, LinearAttention(
                     dim=d, 
                     heads=attn_heads, 
-                    # dim_head=attn_head_dim
-                ))
+                    dim_head=attn_head_dim
+                )))
 
             self.attentions.append(attn)
 
@@ -221,11 +234,11 @@ class Decoder(nn.Module):
             if d == dims[-1]:
                 attn = nn.Identity()
             else:
-                attn = Residual(LinearAttention(
+                attn = Residual(PreNorm(d, LinearAttention(
                     dim=d, 
                     heads=attn_heads,
-                    # dim_head=attn_head_dim
-                ))
+                    dim_head=attn_head_dim
+                )))
 
             self.attentions.append(attn)
 
@@ -256,11 +269,11 @@ class UNetBottom(nn.Module):
         )
 
         # self.attn = Attention(
-        self.attn = LinearAttention(
+        self.attn = Residual(PreNorm(dim, LinearAttention(
             dim=dim, 
             heads=attn_heads, 
             dim_head=attn_head_dim
-        )
+        )))
 
 
     def forward(self, x):
@@ -290,7 +303,7 @@ class Unet2p5D(nn.Module):
         n_classes,
         dim_mults,
         attn_heads,
-        # attn_head_dim,
+        attn_head_dim,
         n_res_blocks
     ):
         super().__init__()
@@ -301,20 +314,20 @@ class Unet2p5D(nn.Module):
             dims=dims,
             n_res_blocks=n_res_blocks,
             attn_heads=attn_heads,
-            # attn_head_dim=attn_head_dim
+            attn_head_dim=attn_head_dim
         )
 
         self.decoder = Decoder(
             dims=dims,
             n_res_blocks=n_res_blocks,
             attn_heads=attn_heads,
-            # attn_head_dim=attn_head_dim
+            attn_head_dim=attn_head_dim
         )
 
         self.bottom = UNetBottom(
             dim=dims[-1],
             n_res_blocks=n_res_blocks,
-            # attn_head_dim=attn_head_dim,
+            attn_head_dim=attn_head_dim,
             attn_heads=attn_heads
         )
 
@@ -325,6 +338,7 @@ class Unet2p5D(nn.Module):
         )
 
     def forward(self, x):
+        # x = (x + 200) / (200 + 200)
         x, enc_residuals = self.encoder(x)
         x = self.bottom(x)
         x = self.decoder(x, enc_residuals)

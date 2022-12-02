@@ -47,4 +47,7 @@ Incomplete layer:
 Rebalance dataset sampling
 
 ## Possible modifications
-* 
+check out [this paper](https://www.sciencedirect.com/science/article/pii/S0925231222000650) that is doing 2.5D segmentation. They use spatial attention, which we are not using. They also do some more tricks, so check it out. 
+
+The representation of the model is likely too small to be able to obtain class information about all the classes for each pixel. The last backbone block has a size that is three times as small as the desired output. You need to let the net have a larger representation.
+

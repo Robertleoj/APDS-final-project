@@ -67,7 +67,7 @@ class Cacher:
         
         slice_list = dp.slice_list
         
-        for vol_slice, seg_slice, slice_index, tensor_idx in slice_list:
+        for slice_index, (vol_slice, seg_slice) in enumerate(slice_list):
 
             seg_fpath = self.__get_fpath(
                 which=which,
@@ -83,25 +83,29 @@ class Cacher:
                 is_seg=False
             )
 
-            torch.save(obj=vol_slice, f=vol_fpath)
-            torch.save(obj=seg_slice, f=seg_fpath)
+            torch.save(obj=vol_slice.clone(), f=vol_fpath)
+            torch.save(obj=seg_slice.clone(), f=seg_fpath)
 
-        segrem_fpath = self.__get_fpath(
-            which=which,
-            slice_idx='rem',
-            sample_idx=sample_idx,
-            is_seg=True
-        )
+        if dp.rem_seg is not None:
+            # slices come from same size tensor, so they both have rem or neither
 
-        volrem_fpath = self.__get_fpath(
-            which=which,
-            slice_idx='rem',
-            sample_idx=sample_idx,
-            is_seg=False
-        )
+            segrem_fpath = self.__get_fpath(
+                which=which,
+                slice_idx='rem',
+                sample_idx=sample_idx,
+                is_seg=True
+            )
 
-        torch.save(obj=dp.rem_seg, f=segrem_fpath)
-        torch.save(obj=dp.rem_vol, f=volrem_fpath)
+            torch.save(obj=dp.rem_seg.clone(), f=segrem_fpath)
+
+            volrem_fpath = self.__get_fpath(
+                which=which,
+                slice_idx='rem',
+                sample_idx=sample_idx,
+                is_seg=False
+            )
+
+            torch.save(obj=dp.rem_vol.clone(), f=volrem_fpath)
 
 
     def nuke(self):
@@ -144,8 +148,10 @@ class Cacher:
             # for i in tqdm(indices):
             #     self.__process_and_save(kind, i, preprocessor)
 
-            with Pool(min(cpu_count(), 4)) as p:
-                p.map(self.process_and_save, args)
+            for a in tqdm(args):
+                self.process_and_save(a)
+            # with Pool(min(cpu_count(), 6)) as p:
+                # p.map(self.process_and_save, args)
 
 
 

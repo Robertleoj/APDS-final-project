@@ -56,7 +56,7 @@ def train(*,
             ep_train_loss.append(train_l)
 
             iters += 1
-            print(f"[Iter {iters}] \n\tloss: {train_l}\n\tdice: {train_d}")
+            print(f"[Iter {iters}] loss: {train_l} dice: {train_d}")
 
         train_loss = torch.tensor(ep_train_loss).mean().item()
         train_die = {}
