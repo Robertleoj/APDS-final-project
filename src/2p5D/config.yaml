@@ -2,6 +2,12 @@ unzipped_path: /home/bigbrainman/APDS-final-project/data/unzipped
 
 cache_dir: /home/bigbrainman/APDS-final-project/data/cache
 
+checkpoint_dir: /home/bigbrainman/APDS-final-project/checkpoints
+
+train_log_file_iters: /home/bigbrainman/APDS-final-project/iters_train.csv
+
+train_log_file_epochs: /home/bigbrainman/APDS-final-project/epochs_train.csv
+
 split_path: datasets/split.json
 
 split:
@@ -12,11 +18,10 @@ split:
 clip_lower: -200
 clip_upper: 200
 
-optimizer: adam
-
 n_res_blocks: 2
 
 batch_size: 8
+dataloader_num_workers: 4
 
 n_classes: 3
 
@@ -27,6 +32,13 @@ dim_mults:
   - 8
   # - 16
 
+learning_rate: 0.001
+
+loss_weights:
+  - 0.1
+  - 0.7
+  - 3
+
 mask_classes:
   empty: 0
   liver: 1
@@ -36,3 +48,7 @@ attn_heads: 4
 
 attn_head_dim: 32
 
+log_every_iter: 1
+log_every_epoch: 1
+
+save_every_iter: 300

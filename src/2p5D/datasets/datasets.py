@@ -23,10 +23,10 @@ class Dataset_2p5D(Dataset):
 
         vol_paths = glob(f"{cache_path}/vol*.pickle")
 
-        indices = [
+        indices = set([
             int(p.split('_')[-2]) 
             for p in vol_paths
-        ]
+        ])
 
         for idx in indices:
             paths = glob(f"{cache_path}/vol_{idx}_*.pickle")
@@ -64,7 +64,7 @@ class Dataset_2p5D(Dataset):
 
         seg =torch.load(seg_path)
 
-        return vol, seg
+        return vol, seg.squeeze(0)
 
 
 class Data:
