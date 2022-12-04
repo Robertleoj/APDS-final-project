@@ -48,6 +48,10 @@ class Trainer:
     def load_newest(self):
         ckpt_paths = glob(f"{self.checkpoint_dir}/*.ckpt")
 
+        if len(ckpt_paths) == 0:
+            print("No checkpoint found. Starting with a randomly initialized model.")
+            return
+
         ckpt_tuples = []
 
         for path in ckpt_paths:
@@ -78,7 +82,7 @@ class Trainer:
 
     def __initialize_loaders(self):
         batch_size = self.config['batch_size']
-        num_workers = self.config['num_workers']
+        num_workers = self.config['dataloader_num_workers']
 
         self.train_loader = DataLoader(
             self.train_set,
@@ -97,7 +101,7 @@ class Trainer:
 
     def __save_checkpoint(self):
         fname = f"weights_{self.total_epochs}_{self.total_iters}.ckpt"
-        fpath = f"{self.checkpoint_dir}/{fname}.ckpt"
+        fpath = f"{self.checkpoint_dir}/{fname}"
         torch.save(self.net.state_dict(), fpath)
 
     def __init_optimizer(self):
@@ -152,7 +156,7 @@ class Trainer:
     def __write_log(self, file: str, fields: dict, fieldnames):
          with open(file, 'a') as f_object:
  
-            writer_object = DictWriter(f_object, fieldnames==fieldnames)
+            writer_object = DictWriter(f_object, fieldnames=fieldnames)
 
             if not os.path.exists(file):
                 writer_object.writeheader()
@@ -168,9 +172,9 @@ class Trainer:
             "epoch": self.total_epochs,
             "iter": self.total_iters,
             "train_loss": train_loss,
-            "train_dice_empty": train_dice["train_dice_empty"],
-            "train_dice_liver": train_dice["train_dice_liver"],
-            "train_dice_cancer": train_dice["train_dice_cancer"]
+            "train_dice_empty": train_dice["empty"],
+            "train_dice_liver": train_dice["liver"],
+            "train_dice_cancer": train_dice["cancer"]
         }
 
         fieldnames = [
@@ -178,8 +182,8 @@ class Trainer:
             "iter", 
             "train_loss", 
             "train_dice_empty", 
-            "train_dice_empty", 
-            "train_dice_empty"
+            "train_dice_liver", 
+            "train_dice_cancer"
         ]
 
         self.__write_log(file=path,fields=fields, fieldnames=fieldnames)

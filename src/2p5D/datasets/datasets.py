@@ -35,7 +35,7 @@ class Dataset_2p5D(Dataset):
                 for p in paths
             ]
 
-            slice_indices = slice_indices[1:-1]
+            slice_indices = sorted(slice_indices)[1:-1]
 
             self.tuples.extend([
                 (idx, slice_idx) 

@@ -51,3 +51,14 @@ check out [this paper](https://www.sciencedirect.com/science/article/pii/S092523
 
 The representation of the model is likely too small to be able to obtain class information about all the classes for each pixel. The last backbone block has a size that is three times as small as the desired output. You need to let the net have a larger representation.
 
+
+Got rid of resizing due to scans in which the liver takes up the whole image 
+
+New Approach: for each slice, concatenate the information of the neighboring slices to the current slice and then predict the segmentation of the middle slice
+
+
+## 2022-12-03:
+Try using two neighboring slices on each side instead of just one
+
+Also add spatial attention instead or along with channel attention. 
+
