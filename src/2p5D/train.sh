@@ -6,7 +6,7 @@
 #SBATCH --gpus-per-node=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16gb                     	# Job memory request
-#SBATCH --partition=allWork
+#SBATCH --partition=doTrain
 #SBATCH --output=train.log 	  	# Standard output and error log; +jobID
 
 #TO USE    sbatch sbatchExample.sh
