@@ -1,12 +1,24 @@
-unzipped_path: /media/bigbrainman/DataDrive/data/LITS17/unzipped
+# unzipped_path: /media/bigbrainman/DataDrive/data/LITS17/unzipped
 
-cache_dir: /media/bigbrainman/DataDrive/data/LITS17/cache
+unzipped_path: /home/gimli/APDS-final-project/data/unzipped
 
-checkpoint_dir: /home/bigbrainman/APDS-final-project/src/2p5D/checkpoints
+# cache_dir: /media/bigbrainman/DataDrive/data/LITS17/cache
 
-train_log_file_iters: /home/bigbrainman/APDS-final-project/src/2p5D/iters_train.csv
+cache_dir: /home/gimli/APDS-final-project/data/cached
 
-train_log_file_epochs: /home/bigbrainman/APDS-final-project/src/2p5D/epochs_train.csv
+# checkpoint_dir: /home/bigbrainman/APDS-final-project/src/2p5D/checkpoints
+
+checkpoint_dir: /home/gimli/APDS-final-project/src/2p5D/checkpoints
+
+# train_log_file_iters: /home/bigbrainman/APDS-final-project/src/2p5D/iters_train.csv
+
+train_log_file_iters: /home/gimli/APDS-final-project/src/2p5D/iters_train.csv
+
+# train_log_file_epochs: /home/bigbrainman/APDS-final-project/src/2p5D/epochs_train.csv
+
+train_log_file_epochs: /home/gimli/APDS-final-project/src/2p5D/epochs_train.csv
+
+
 
 split_path: datasets/split.json
 
