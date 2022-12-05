@@ -102,7 +102,7 @@ class Trainer:
     def __save_checkpoint(self):
         fname = f"weights_{self.total_epochs}_{self.total_iters}.ckpt"
         fpath = f"{self.checkpoint_dir}/{fname}"
-        os.makedirs(self.chekpoint_dir, exist_ok=True)
+        os.makedirs(self.checkpoint_dir, exist_ok=True)
         torch.save(self.net.state_dict(), fpath)
 
     def __init_optimizer(self):
