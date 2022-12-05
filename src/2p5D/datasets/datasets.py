@@ -64,7 +64,7 @@ class Dataset_2p5D(Dataset):
 
         seg =torch.load(seg_path)
 
-        return vol, seg.squeeze(0)
+        return vol.to(dtype=torch.float), seg.squeeze(0).to(dtype=float.long)
 
 
 class Data:

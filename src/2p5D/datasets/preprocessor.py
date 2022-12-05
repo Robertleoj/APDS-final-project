@@ -20,15 +20,16 @@ class Preprocessor_2p5D:
         seg_file = f"{self.data_path}/segmentation-{scan_index}.nii"
         vol_file = f"{self.data_path}/volume-{scan_index}.nii"
         
-        seg_arr = read_nii(seg_file).to(dtype=torch.long)
-        vol_arr = read_nii(vol_file).to(dtype=torch.float)
+        seg_arr = read_nii(seg_file).to(dtype=torch.uint8)
+        vol_arr = read_nii(vol_file)
 
 
         # print(seg_arr.shape)
         # print(vol_arr.shape)
 
 
-        vol_arr = self.__normalize(vol_arr)
+        vol_arr = self.__normalize(vol_arr).to(dtype=torch.float16)
+
 
 
         full_vol_arr = vol_arr.permute(2, 0, 1).clone()
