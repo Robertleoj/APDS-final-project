@@ -18,15 +18,14 @@ class WhichSplit(Enum):
     @classmethod
     def get_name(cls, instance):
 
-        match instance:
-            case WhichSplit.train:
-                return 'train'
-            case WhichSplit.val:
-                return 'val'
-            case WhichSplit.test:
-                return 'test'
+        if instance == WhichSplit.train:
+            return 'train'
 
-       
+        if instance == WhichSplit.val:
+            return 'val'
+
+        if instance == WhichSplit.test:
+            return 'test'
 
 class Cacher:
     def __init__(self, *,
@@ -50,13 +49,7 @@ class Cacher:
         which:WhichSplit, slice_idx, sample_idx,  is_seg
     ):
 
-        match which:
-            case WhichSplit.train:
-                postfix = 'train'
-            case WhichSplit.val:
-                postfix = 'val'
-            case WhichSplit.test:
-                postfix = 'test'
+        postfix = WhichSplit.get_name(which)
 
         folder_path = self.cache_path + '/' + postfix 
 
