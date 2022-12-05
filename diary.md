@@ -62,3 +62,5 @@ Try using two neighboring slices on each side instead of just one
 
 Also add spatial attention instead or along with channel attention. 
 
+How to create gifs with matplotlib:
+[https://towardsdatascience.com/basics-of-gifs-with-pythons-matplotlib-54dd544b6f30]
