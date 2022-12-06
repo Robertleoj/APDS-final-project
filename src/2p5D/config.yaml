@@ -27,7 +27,7 @@ n_res_blocks: 2
 
 batch_size: 16
 
-eval_batch_size: 32
+eval_batch_size: 8
 
 dataloader_num_workers: 4
 
