@@ -40,7 +40,6 @@ dim_mults:
   - 8
   - 16
   - 32
-  - 64
 
 learning_rate: 0.001
 
