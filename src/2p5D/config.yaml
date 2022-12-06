@@ -38,7 +38,7 @@ dim_mults:
   - 2
   - 4
   - 8
-  # - 16
+  - 16
 
 learning_rate: 0.001
 
