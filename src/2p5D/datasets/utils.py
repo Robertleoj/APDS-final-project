@@ -12,32 +12,40 @@ DataPoint = namedtuple('DataPoint', (
     'slice_list',
 ))
 
-def check_orientation(ct_image, ct_arr):
+def check_orientation(vol_image, vol_arr, seg_arr):
     """
     Check the NIfTI orientation, and flip to  'RPS' if needed.
     :param ct_image: NIfTI file
     :param ct_arr: array file
     :return: array after flipping
     """
-    x, y, z = nib.aff2axcodes(ct_image.affine)
+    x, y, z = nib.aff2axcodes(vol_image.affine)
     if x != 'R':
-        ct_arr = torch.flip(ct_arr, dims=(0,))
+        vol_arr = torch.flip(vol_arr, dims=(0,))
+        seg_arr = torch.flip(seg_arr, dims=(0,))
     if y != 'P':
-        ct_arr = torch.flip(ct_arr, dims=(1,))
+        vol_arr = torch.flip(vol_arr, dims=(1,))
+        seg_arr = torch.flip(seg_arr, dims=(1,))
     if z != 'S':
-        ct_arr = torch.flip(ct_arr, dims=(2,))
-    return ct_arr
+        vol_arr = torch.flip(vol_arr, dims=(2,))
+        seg_arr = torch.flip(seg_arr, dims=(2,))
+    return vol_arr, seg_arr
 
 
-def read_nii(filepath):
+def read_nii(vol_filepath, seg_filepath):
     '''
     Reads .nii file and returns pixel array
     '''
-    ct_scan = nib.load(filepath)
-    array = ct_scan.get_fdata()
-    array = torch.tensor(array)
-    array = check_orientation(ct_scan, array)
-    return(array)
+    vol_scan = nib.load(vol_filepath)
+    seg_scan = nib.load(seg_filepath)
+
+    vol_array = vol_scan.get_fdata()
+    seg_array = seg_scan.get_fdata()
+    vol_array = torch.tensor(vol_array)
+    seg_array = torch.tensor(seg_array)
+
+    vol_array, seg_array = check_orientation(vol_scan, vol_array, seg_array)
+    return vol_array, seg_array
 
 #assumes path goes to directory to clean
 def nuke(path):
