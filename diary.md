@@ -71,3 +71,6 @@ How to create gifs with matplotlib:
 Try increasing the number of slices in the 2.5D
 
 Also try using either SE blocks, or CBAM
+
+
+# 2022-12-07

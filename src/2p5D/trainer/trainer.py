@@ -88,7 +88,7 @@ class Trainer:
             self.train_set,
             batch_size=batch_size,
             num_workers=num_workers,
-            shuffle=True,
+            # shuffle=True,
             pin_memory=True
         )
 
@@ -224,43 +224,39 @@ class Trainer:
         self.__write_log(path, fields, fieldnames)
         
 
-    def train(self, n_epochs):
+    def train(self):
 
-        for _ in range(n_epochs):
 
-            ep_train_loss = []
-            ep_train_dice = []
+        for X_train, y_train in self.train_loader:
+            train_l, train_d = self.__iterate(X_train, y_train, train=True)
+            
+            if (self.total_iters % self.log_every_iter) == 0:
+                self.__log_performance_iters(train_l, train_d)
 
-            for X_train, y_train in self.train_loader:
-                train_l, train_d = self.__iterate(X_train, y_train, train=True)
-                
-                if (self.total_iters % self.log_every_iter) == 0:
-                    self.__log_performance_iters(train_l, train_d)
+            if self.total_iters % self.save_every_iter == 0:
+                self.__save_checkpoint()
 
-                if self.total_iters % self.save_every_iter == 0:
-                    self.__save_checkpoint()
+            # ep_train_dice.append(train_d)
+            # ep_train_loss.append(train_l)
 
-                ep_train_dice.append(train_d)
-                ep_train_loss.append(train_l)
+        # train_loss = torch.tensor(ep_train_loss).mean().item()
+        # train_dice = self.__make_epoch_total_dice(ep_train_dice)
+    
+        # ep_val_loss = []
+        # ep_val_dice = []
 
-            train_loss = torch.tensor(ep_train_loss).mean().item()
-            train_dice = self.__make_epoch_total_dice(ep_train_dice)
-        
-            ep_val_loss = []
-            ep_val_dice = []
+        # for X_val, y_val in self.val_loader:
+        #     val_l, val_d = self.__iterate(X_val, y_val, train=False)
+        #     ep_val_dice.append(val_d)
+        #     ep_val_loss.append(val_l)
 
-            for X_val, y_val in self.val_loader:
-                val_l, val_d = self.__iterate(X_val, y_val, train=False)
-                ep_val_dice.append(val_d)
-                ep_val_loss.append(val_l)
+        # val_loss = torch.tensor(ep_train_loss).mean().item()
+        # val_dice = self.__make_epoch_total_dice(ep_train_dice)
 
-            val_loss = torch.tensor(ep_train_loss).mean().item()
-            val_dice = self.__make_epoch_total_dice(ep_train_dice)
+        # self.total_epochs += 1
 
-            self.total_epochs += 1
-
-            if self.total_epochs % self.log_every_epoch == 0:
-                self.__log_performance_epochs(train_loss, train_dice, val_loss, val_dice)
+        # if self.total_epochs % self.log_every_epoch == 0:
+        #     self.__log_performance_epochs(train_loss, train_dice, val_loss, val_dice)
 
 
  

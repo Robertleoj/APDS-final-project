@@ -1,7 +1,7 @@
 import numpy as np
 # from ..load_config import load_config
 from glob import glob
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import IterableDataset, DataLoader
 from .cacher import Cacher
 import torch
 import random
@@ -13,17 +13,12 @@ import os
 def get_scan_file_paths(data_path):
     return glob(f"{data_path}/*.nii")
 
-class Dataset_2p5D(Dataset):
+class Dataset_2p5D(IterableDataset):
     def __init__(self, cache_path, n_slices):
 
-        # seg_fpaths = sorted(glob(f"{cache_path}/seg*.pickle"))
-        # vol_fpaths = sorted(glob(f"{cache_path}/vol*.pickle"))
 
-        self.tuples = []
 
         self.either_side = n_slices // 2
-
-
 
         vol_paths = glob(f"{cache_path}/vol*.pickle")
 
@@ -31,6 +26,8 @@ class Dataset_2p5D(Dataset):
             int(p.split('_')[-2]) 
             for p in vol_paths
         ])
+
+        self.tuples = {i: [] for i in indices}
 
         for idx in indices:
             paths = glob(f"{cache_path}/vol_{idx}_*.pickle")
@@ -41,34 +38,37 @@ class Dataset_2p5D(Dataset):
 
             slice_indices = sorted(slice_indices)[self.either_side:-self.either_side]
 
-            self.tuples.extend([
+            self.tuples[idx].extend([
                 (idx, slice_idx) 
                 for slice_idx in slice_indices
             ])
 
         self.cache_path = cache_path
 
-    def __len__(self):
-        return len(self.tuples)
+        self.tuples = [v for v in self.tuples.values()]
 
-    def __getitem__(self, idx):
 
-        scan_idx, slice_idx = self.tuples[idx]
+    def __iter__(self):
 
-        vol_paths = [
-            f"{self.cache_path}/vol_{scan_idx}_{slice_idx + i}.pickle"
-            for i in range(-self.either_side, self.either_side + 1)
-        ]
+        while True:
+            lst = random.choice(self.tuples)
 
-        seg_path = f"{self.cache_path}/seg_{scan_idx}_{slice_idx}.pickle"
+            scan_idx, slice_idx = random.choice(lst)
 
-        vol = torch.concat(
-            [torch.load(path) for path in vol_paths], dim=0
-        )
+            vol_paths = [
+                f"{self.cache_path}/vol_{scan_idx}_{slice_idx + i}.pickle"
+                for i in range(-self.either_side, self.either_side + 1)
+            ]
 
-        seg =torch.load(seg_path)
+            seg_path = f"{self.cache_path}/seg_{scan_idx}_{slice_idx}.pickle"
 
-        return vol.to(dtype=torch.float), seg.squeeze(0).to(dtype=torch.long)
+            vol = torch.concat(
+                [torch.load(path) for path in vol_paths], dim=0
+            )
+
+            seg = torch.load(seg_path)
+
+            yield vol.to(dtype=torch.float), seg.squeeze(0).to(dtype=torch.long)
 
 
 class Data:
@@ -167,35 +167,4 @@ class Data:
 
         with open(self.config['split_path'], 'w') as f:
             json.dump(ind_dict, f, indent=4)
-
-
-
-
-
-
-
-        
-
-
-    
-
-# def get_dsets():
-#     """
-#     Returns train, val, test datasets
-#     """
-#     pass
-
-
-
-# Need to
-# import scans
-
-# cache
-# train, test, val split
-# make pytorch datasets
-# make them importable directly
-
-# have files containing indices for splits
-# 
-
 

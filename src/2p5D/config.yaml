@@ -43,7 +43,7 @@ dim_mults:
   - 16
   - 32
 
-learning_rate: 0.001
+learning_rate: 0.0001
 
 loss_weights:
   - 0.1

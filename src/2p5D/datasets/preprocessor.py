@@ -1,4 +1,11 @@
-from .utils import read_nii, DataPoint, resize_seg, resize_volume
+from .utils import (
+    read_nii_scan, 
+    DataPoint, 
+    resize_seg, 
+    resize_volume,
+    read_nii
+)
+
 import torch
 
 
@@ -15,12 +22,21 @@ class Preprocessor_2p5D:
         x = (x - self.clip_lower) / (self.clip_upper - self.clip_lower)
         return x
 
+    def get_seg(self, idx):
+        """
+        WARNING: 
+        this does not return the mask in the correct orientation
+        """
+
+        seg_file = f"{self.data_path}/segmentation-{idx}.nii"
+        return read_nii(seg_file)
+
     def process(self, scan_index):
         
         seg_file = f"{self.data_path}/segmentation-{scan_index}.nii"
         vol_file = f"{self.data_path}/volume-{scan_index}.nii"
 
-        vol_arr, seg_arr = read_nii(vol_file, seg_file)
+        vol_arr, seg_arr = read_nii_scan(vol_file, seg_file)
 
         seg_arr = seg_arr.to(dtype=torch.uint8)
 

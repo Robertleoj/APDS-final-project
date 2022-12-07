@@ -32,7 +32,11 @@ def check_orientation(vol_image, vol_arr, seg_arr):
     return vol_arr, seg_arr
 
 
-def read_nii(vol_filepath, seg_filepath):
+def read_nii(fpath):
+    img = nib.load(fpath)
+    return torch.tensor(img.get_fdata())
+
+def read_nii_scan(vol_filepath, seg_filepath):
     '''
     Reads .nii file and returns pixel array
     '''
