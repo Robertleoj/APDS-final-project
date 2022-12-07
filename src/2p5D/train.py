@@ -17,4 +17,4 @@ trainer = Trainer(config=config, net=net, train_set=train_set, val_set=val_set)
 
 n_epochs = 5 if len(argv) == 1 else int(argv[1])
 
-trainer.train(n_epochs)
+trainer.train()
