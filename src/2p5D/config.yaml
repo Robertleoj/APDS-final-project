@@ -25,7 +25,7 @@ clip_upper: 200
 
 n_res_blocks: 2
 
-batch_size: 16
+batch_size: 8
 
 eval_batch_size: 8
 
