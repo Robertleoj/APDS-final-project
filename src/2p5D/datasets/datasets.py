@@ -14,12 +14,16 @@ def get_scan_file_paths(data_path):
     return glob(f"{data_path}/*.nii")
 
 class Dataset_2p5D(Dataset):
-    def __init__(self, cache_path):
+    def __init__(self, cache_path, n_slices):
 
         # seg_fpaths = sorted(glob(f"{cache_path}/seg*.pickle"))
         # vol_fpaths = sorted(glob(f"{cache_path}/vol*.pickle"))
 
         self.tuples = []
+
+        self.either_side = n_slices // 2
+
+
 
         vol_paths = glob(f"{cache_path}/vol*.pickle")
 
@@ -35,7 +39,7 @@ class Dataset_2p5D(Dataset):
                 for p in paths
             ]
 
-            slice_indices = sorted(slice_indices)[1:-1]
+            slice_indices = sorted(slice_indices)[self.either_side:-self.either_side]
 
             self.tuples.extend([
                 (idx, slice_idx) 
@@ -53,7 +57,7 @@ class Dataset_2p5D(Dataset):
 
         vol_paths = [
             f"{self.cache_path}/vol_{scan_idx}_{slice_idx + i}.pickle"
-            for i in (-1, 0, 1)
+            for i in range(-self.either_side, self.either_side + 1)
         ]
 
         seg_path = f"{self.cache_path}/seg_{scan_idx}_{slice_idx}.pickle"
@@ -78,17 +82,17 @@ class Data:
 
     def get_train(self):
         return Dataset_2p5D(
-            f"{self.config['cache_dir']}/train"
+            f"{self.config['cache_dir']}/train", self.config['n_slices']
         )
 
     def get_val(self):
         return Dataset_2p5D(
-            f"{self.config['cache_dir']}/val"
+            f"{self.config['cache_dir']}/val", self.config['n_slices']
         )
 
     def get_test(self):
         return Dataset_2p5D(
-            f"{self.config['cache_dir']}/test"
+            f"{self.config['cache_dir']}/test", self.config['n_slices']
         )
 
     def __check_cache(self):

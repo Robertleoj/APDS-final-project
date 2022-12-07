@@ -33,6 +33,8 @@ dataloader_num_workers: 4
 
 n_classes: 3
 
+n_slices: 5
+
 dim_mults: 
   - 1
   - 2

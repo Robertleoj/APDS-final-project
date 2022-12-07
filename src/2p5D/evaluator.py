@@ -57,7 +57,8 @@ class Evaluator:
         
     
     def __make_empty(self):
-        empty = torch.zeros((1, 512, 512), dtype=torch.long)
+        either_side = self.config['n_slices'] // 2
+        empty = torch.zeros((either_side, 512, 512), dtype=torch.long)
         
         return empty
 

@@ -415,11 +415,15 @@ class Unet2p5D(nn.Module):
             attn_heads=attn_heads
         )
 
+        self.out = nn.Conv2d(dim, n_classes, 1) if dim != n_classes else nn.Identity()
+
     def forward(self, x):
         # x = (x + 200) / (200 + 200)
         x, enc_residuals = self.encoder(x)
         x = self.bottom(x)
         x = self.decoder(x, enc_residuals)
+        x = self.out(x)
+
         return x
 
         
