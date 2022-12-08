@@ -11,7 +11,7 @@ class Evaluator:
     def __init__(self, config, net, device='cpu'):
 
         self.config = config
-        self.net = net
+        self.net = net.to(device)
         self.eval_batch_size = config['eval_batch_size']
         self.slice_size = config['n_slices']
         self.device = device
