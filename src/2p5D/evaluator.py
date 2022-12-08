@@ -8,7 +8,12 @@ from glob import glob
 
 
 class Evaluator:
-    def __init__(self, config, net, device='cpu'):
+    def __init__(self, config, net, device='cpu', print_func=None):
+
+        if print_func is None:
+            self.print_func = print
+        else:
+            self.print_func = print_func
 
         self.config = config
         self.net = net.to(device)
@@ -25,7 +30,7 @@ class Evaluator:
         predictions.append(self.__make_empty())
 
         total_slices = 0
-        print(f"Total slices = {total_slices}", end='')
+        self.print_func(f"Total slices = {total_slices}")
 
         for batch in self.__make_batches(vol):
             
@@ -36,7 +41,7 @@ class Evaluator:
 
             total_slices += batch.shape[0]
 
-            print(f"\rTotal slices = {total_slices}", end='')
+            self.print_func(f"Total slices = {total_slices}")
 
         print()
 
@@ -68,26 +73,27 @@ class Evaluator:
             dice_score = dice_all(seg, model_out, self.config['mask_classes'])
 
             dice_scores[idx] = dice_score
-            print(f"{idx=} {dice_score=}")
+            self.print_func(f"{idx=} {dice_score=}")
 
         return dice_scores
 
     def evaluate_all_checkpoints(self):
-        print("evaluate all checkpoints")
+
+        self.print_func("evaluate all checkpoints")
         dice_all = {}
         checkpoint_dir = self.config['checkpoint_dir']
 
         get_iter = lambda p: int(p.split('_')[-1].split('.')[0])
 
-        print("obtaining all checkpoint iterations")
+        self.print_func("obtaining all checkpoint iterations")
         all_ckpt_iters = list(map(
             get_iter,
             glob(f'{checkpoint_dir}/*.ckpt')
         ))
 
-        print("Starting main for loop")
+        self.print_func("Starting main for loop")
         for itr in sorted(all_ckpt_iters):
-            print(f"Evaluating checkpoint at {itr} iters")
+            self.print_func(f"Evaluating checkpoint at {itr} iters")
             dice_all[itr] = self.evaluate_checkpoint(itr)
 
         return dice_all

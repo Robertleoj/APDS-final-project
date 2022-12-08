@@ -30,7 +30,7 @@ net = model_from_config(config)
 p("Instantiating Evaluator ...", f)
 
 
-eval = Evaluator(config, device='cuda', net=net)
+eval = Evaluator(config, device='cuda', net=net, print_func=lambda l: p(l, f))
 
 p("Starting to evaluate checkpoints",f)
 
