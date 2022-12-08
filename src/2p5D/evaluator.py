@@ -73,16 +73,19 @@ class Evaluator:
         return dice_scores
 
     def evaluate_all_checkpoints(self):
+        print("evaluate all checkpoints")
         dice_all = {}
         checkpoint_dir = self.config['checkpoint_dir']
 
         get_iter = lambda p: int(p.split('_')[-1].split('.')[0])
 
+        print("obtaining all checkpoint iterations")
         all_ckpt_iters = list(map(
             get_iter,
             glob(f'{checkpoint_dir}/*.ckpt')
         ))
 
+        print("Starting main for loop")
         for itr in sorted(all_ckpt_iters):
             print(f"Evaluating checkpoint at {itr} iters")
             dice_all[itr] = self.evaluate_checkpoint(itr)
