@@ -92,9 +92,15 @@ class Evaluator:
         ))
 
         self.print_func("Starting main for loop")
-        for itr in sorted(all_ckpt_iters):
+        
+        all_ckpt_iters = sorted(all_ckpt_iters)
+
+        itr = all_ckpt_iters[0]
+
+        while itr in all_ckpt_iters:
             self.print_func(f"Evaluating checkpoint at {itr} iters")
             dice_all[itr] = self.evaluate_checkpoint(itr)
+            itr += 3000
 
         return dice_all
 
