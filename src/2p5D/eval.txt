@@ -1,0 +1,10 @@
+start
+start
+importing evaluator
+importing from utils
+importing from load_configr
+importing json
+Loading config...
+Loading model...
+Instantiating Evaluator ...
+Starting to evaluate checkpoints
