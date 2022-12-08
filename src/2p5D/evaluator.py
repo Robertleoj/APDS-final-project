@@ -83,7 +83,8 @@ class Evaluator:
             glob(f'{checkpoint_dir}/*.ckpt')
         ))
 
-        for itr in all_ckpt_iters:
+        for itr in sorted(all_ckpt_iters):
+            print(f"Evaluating checkpoint at {itr} iters")
             dice_all[itr] = self.evaluate_checkpoint(itr)
 
         return dice_all
