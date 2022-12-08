@@ -31,27 +31,29 @@ class Preprocessor_2p5D:
         seg_file = f"{self.data_path}/segmentation-{idx}.nii"
         return read_nii(seg_file)
 
-    def process(self, scan_index):
-        
-        seg_file = f"{self.data_path}/segmentation-{scan_index}.nii"
-        vol_file = f"{self.data_path}/volume-{scan_index}.nii"
+    def get_scan_no_slice(self, idx):
+        seg_file = f"{self.data_path}/segmentation-{idx}.nii"
+        vol_file = f"{self.data_path}/volume-{idx}.nii"
 
         vol_arr, seg_arr = read_nii_scan(vol_file, seg_file)
 
         seg_arr = seg_arr.to(dtype=torch.uint8)
 
-        vol_arr = self.__normalize(vol_arr).to(dtype=torch.float16)
-
-
-        full_vol_arr = vol_arr.permute(2, 0, 1).clone()
-        full_seg_arr = seg_arr.permute(2, 0, 1).clone()
-
-
-        vol_arr = vol_arr.to(dtype=torch.float32)
-
+        vol_arr = self.__normalize(vol_arr).to(dtype=torch.float32)
 
         vol_arr = vol_arr.permute(2, 0, 1).flip((0,))
         seg_arr = seg_arr.permute(2, 0, 1).flip((0,))
+
+        return vol_arr, seg_arr
+
+      
+
+    def process(self, scan_index):
+
+        vol_arr, seg_arr = self.get_scan_no_slice(scan_index)
+        
+        full_vol_arr = vol_arr.clone()
+        full_seg_arr = seg_arr.clone()
 
         vol_arr_slices = vol_arr.split(1)
         seg_arr_slices = seg_arr.split(1)
@@ -66,9 +68,5 @@ class Preprocessor_2p5D:
         )
 
         return dp
-
-# turn into tensors
-# normalize
-# handle differing sizes
 
     
