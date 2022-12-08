@@ -1,16 +1,16 @@
 # robbi
-#unzipped_path: /media/bigbrainman/DataDrive/data/LITS17/unzipped
-#cache_dir: /media/bigbrainman/DataDrive/data/LITS17/cache
-#checkpoint_dir: /home/bigbrainman/APDS-final-project/src/2p5D/checkpoints
-#train_log_file_iters: /home/bigbrainman/APDS-final-project/src/2p5D/iters_train.csv
-#train_log_file_epochs: /home/bigbrainman/APDS-final-project/src/2p5D/epochs_train.csv
+unzipped_path: /media/bigbrainman/DataDrive/data/LITS17/unzipped
+cache_dir: /media/bigbrainman/DataDrive/data/LITS17/cache
+checkpoint_dir: /home/bigbrainman/APDS-final-project/src/2p5D/checkpoints
+train_log_file_iters: /home/bigbrainman/APDS-final-project/src/2p5D/iters_train.csv
+train_log_file_epochs: /home/bigbrainman/APDS-final-project/src/2p5D/epochs_train.csv
 
 # gimli
-unzipped_path: /home/gimli/APDS-final-project/data/unzipped
-cache_dir: /home/gimli/APDS-final-project/data/cached
-checkpoint_dir: /home/gimli/APDS-final-project/src/2p5D/checkpoints
-train_log_file_iters: /home/gimli/APDS-final-project/src/2p5D/iters_train.csv
-train_log_file_epochs: /home/gimli/APDS-final-project/src/2p5D/epochs_train.csv
+#unzipped_path: /home/gimli/APDS-final-project/data/unzipped
+#cache_dir: /home/gimli/APDS-final-project/data/cached
+#checkpoint_dir: /home/gimli/APDS-final-project/src/2p5D/checkpoints
+#train_log_file_iters: /home/gimli/APDS-final-project/src/2p5D/iters_train.csv
+#train_log_file_epochs: /home/gimli/APDS-final-project/src/2p5D/epochs_train.csv
 
 
 split_path: datasets/split.json
@@ -27,7 +27,7 @@ n_res_blocks: 2
 
 batch_size: 8
 
-eval_batch_size: 63
+eval_batch_size: 8
 
 dataloader_num_workers: 4
 

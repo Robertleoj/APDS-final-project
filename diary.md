@@ -73,4 +73,6 @@ Try increasing the number of slices in the 2.5D
 Also try using either SE blocks, or CBAM
 
 
-# 2022-12-07
+# 2022-12-08
+Postprocessing:
+* Remove all but the largest connected component of non-zero mask predictions
