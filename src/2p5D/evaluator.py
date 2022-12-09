@@ -1,8 +1,9 @@
 
 import torch
-from utils import load_checkpoint, dice_all
+from utils import load_checkpoint, dice_all, postprocess
 from datasets import Preprocessor_2p5D, get_split_indices
 from glob import glob
+
 
 
 
@@ -52,7 +53,7 @@ class Evaluator:
         return torch.concat(predictions, dim=0)
 
 
-    def evaluate_checkpoint(self, ckpt_iters):
+    def evaluate_checkpoint(self, ckpt_iters, apply_postprocess=True):
         self.net = load_checkpoint(
             self.net, 
             epoch=0, 
@@ -70,6 +71,9 @@ class Evaluator:
             vol, seg = self.preprocessor.get_scan_no_slice(idx)
             model_out = self.evaluate(vol)
 
+            if apply_postprocess:
+                model_out = postprocess(model_out)
+
             dice_score = dice_all(seg, model_out, self.config['mask_classes'])
 
             dice_scores[idx] = dice_score
@@ -77,7 +81,7 @@ class Evaluator:
 
         return dice_scores
 
-    def evaluate_all_checkpoints(self):
+    def evaluate_all_checkpoints(self, apply_postprocess=True):
 
         self.print_func("evaluate all checkpoints")
         dice_all = {}
@@ -99,7 +103,7 @@ class Evaluator:
 
         while itr in all_ckpt_iters:
             self.print_func(f"Evaluating checkpoint at {itr} iters")
-            dice_all[itr] = self.evaluate_checkpoint(itr)
+            dice_all[itr] = self.evaluate_checkpoint(itr, apply_postprocess)
             itr += 3000
 
         return dice_all

@@ -271,8 +271,15 @@ class PreNorm(nn.Module):
 
 
 class Encoder(nn.Module):
-    def __init__(self, *, dims, n_res_blocks, attn_heads, attn_head_dim=None):
+    def __init__(self, *, dims, n_res_blocks, 
+        use_self_attention=False, 
+        attn_heads=None, 
+        attn_head_dim=None
+    ):
+
         super().__init__()
+
+        assert (use_self_attention is False or attn_heads is not None)
 
         self.bb_blocks = nn.ModuleList([])
         self.attentions = nn.ModuleList([])
@@ -284,7 +291,7 @@ class Encoder(nn.Module):
             block = BackboneBlock(dim=d, n_res_blocks=n_res_blocks)
             self.bb_blocks.append(block)
 
-            if d == dims[0]:
+            if d == dims[0] or use_self_attention is False:
                 attn = nn.Identity()
             else:
                 attn = Residual(PreNorm(d, LinearAttention(
@@ -312,8 +319,10 @@ class Encoder(nn.Module):
 
 
 class Decoder(nn.Module):
-    def __init__(self, *, dims, n_res_blocks, attn_heads, attn_head_dim=None):
+    def __init__(self, *, dims, n_res_blocks, use_self_attention=False, attn_heads=None, attn_head_dim=None):
         super().__init__()
+
+        assert (use_self_attention is False or attn_heads is not None)
 
         self.upsamples = nn.ModuleList([])
         self.bb_blocks = nn.ModuleList([])
@@ -332,7 +341,7 @@ class Decoder(nn.Module):
             
             self.bb_blocks.append(block)
 
-            if d == dims[-1]:
+            if d == dims[-1] or use_self_attention is False:
                 attn = nn.Identity()
             else:
                 attn = Residual(PreNorm(d, LinearAttention(
@@ -363,8 +372,10 @@ class Decoder(nn.Module):
 
 
 class UNetBottom(nn.Module):
-    def __init__(self, *, dim, n_res_blocks, attn_heads, attn_head_dim=None):
+    def __init__(self, *, dim, n_res_blocks, use_self_attention=False, attn_heads=None, attn_head_dim=None):
         super().__init__()
+        assert (use_self_attention is False or attn_heads is not None)
+
         self.backbone_block = BackboneBlock(
             dim=dim, n_res_blocks=n_res_blocks
         )
@@ -374,7 +385,7 @@ class UNetBottom(nn.Module):
             dim=dim, 
             heads=attn_heads, 
             dim_head=attn_head_dim
-        )))
+        ))) if use_self_attention else nn.Identity()
 
 
     def forward(self, x):
@@ -386,9 +397,10 @@ class Unet2p5D(nn.Module):
         dim, 
         n_classes,
         dim_mults,
-        attn_heads,
-        attn_head_dim,
-        n_res_blocks
+        attn_heads=None,
+        attn_head_dim=None,
+        n_res_blocks,
+        use_self_attention=False
     ):
         super().__init__()
 
@@ -398,21 +410,24 @@ class Unet2p5D(nn.Module):
             dims=dims,
             n_res_blocks=n_res_blocks,
             attn_heads=attn_heads,
-            attn_head_dim=attn_head_dim
+            attn_head_dim=attn_head_dim,
+            use_self_attention=use_self_attention
         )
 
         self.decoder = Decoder(
             dims=dims,
             n_res_blocks=n_res_blocks,
             attn_heads=attn_heads,
-            attn_head_dim=attn_head_dim
+            attn_head_dim=attn_head_dim,
+            use_self_attention=use_self_attention
         )
 
         self.bottom = UNetBottom(
             dim=dims[-1],
             n_res_blocks=n_res_blocks,
             attn_head_dim=attn_head_dim,
-            attn_heads=attn_heads
+            attn_heads=attn_heads,
+            use_self_attention=use_self_attention
         )
 
         self.out = nn.Conv2d(dim, n_classes, 1) if dim != n_classes else nn.Identity()

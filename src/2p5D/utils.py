@@ -1,9 +1,11 @@
 
+from scipy.ndimage import label
 from models.UNet2p5D.Unet import Unet2p5D
 from glob import glob
 import os
 import torch
 
+import numpy as np
 
 def dice_all(mask1, mask2, mask_classes):
     dices = {}
@@ -20,7 +22,8 @@ def model_from_config(config):
         dim_mults=config['dim_mults'],
         attn_heads=config['attn_heads'],
         attn_head_dim=config['attn_head_dim'],
-        n_res_blocks=config['n_res_blocks']
+        n_res_blocks=config['n_res_blocks'],
+        use_self_attention=config['use_self_attention']
     )
 
 def inverse_norm(x,config):
@@ -74,4 +77,28 @@ def load_checkpoint(net, epoch, iter, ckpts_path, device="cpu"):
     )
 
     return net
+
+def postprocess(seg_pred: torch.Tensor):
+    structure = np.ones((3, 3, 3))
+
+    labeled, ncomponents = label((seg_pred != 0).int().numpy(), structure)
+
+    # indices = np.indices(seg_pred.shape).T[:,:,:,[1, 0]]
+
+    biggest_component_idx = None
+    biggest_component_size = -1
+
+    for i in range(1, ncomponents + 1):
+
+        c_size = (labeled == i).sum()
+
+        if c_size > biggest_component_size:
+            biggest_component_size = c_size
+            biggest_component_idx = i
+
+    seg_clone = seg_pred.clone()
+    seg_clone[labeled != biggest_component_idx] = 0
+
+    return seg_clone
+
 
