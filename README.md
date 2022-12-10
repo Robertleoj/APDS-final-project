@@ -1,6 +1,6 @@
 
 
-hello world!
+# Applied Data Science Final Project
 
-hello back!
+Here we performed liver cancer segmentation using the LiTS dataset. See report for detailed information.
 
