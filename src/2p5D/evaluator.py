@@ -25,13 +25,21 @@ class Evaluator:
         
 
     def evaluate(self, vol):
+
+        self.net.eval()
         predictions = []
 
         # add an empty prediction to predictions
         predictions.append(self.__make_empty())
 
         total_slices = 0
-        self.print_func(f"Total slices = {total_slices}")
+
+        print(f"Total slices = {vol.shape[0]}")
+
+        if self.print_func is print:
+            self.print_func(f"Processed slices = {total_slices}", end='')
+        else:
+            self.print_func(f"Processed slices = {total_slices}")
 
         for batch in self.__make_batches(vol):
             
@@ -41,8 +49,11 @@ class Evaluator:
                 predictions.append(pred.cpu())
 
             total_slices += batch.shape[0]
-
-            self.print_func(f"Total slices = {total_slices}")
+            
+            if self.print_func is print:
+                self.print_func(f"\rProcessed slices = {total_slices}", end='')
+            else:
+                self.print_func(f"Processed slices = {total_slices}")
 
         print()
 
@@ -53,17 +64,35 @@ class Evaluator:
         return torch.concat(predictions, dim=0)
 
 
-    def evaluate_checkpoint(self, ckpt_iters, apply_postprocess=True):
+    def evaluate_checkpoint(self, 
+        ckpt_iters, 
+        apply_postprocess=True,
+        which_split='val'
+    ):
+
+        assert which_split in ('train', 'val', 'test')
+
         self.net = load_checkpoint(
             self.net, 
             epoch=0, 
             iter=ckpt_iters,
             ckpts_path=self.config['checkpoint_dir'],
-            device=self.device
+            device=self.device,
         )
 
         split_indices = get_split_indices(self.config['split_path'])
-        val_indices = split_indices[1]
+
+        if which_split == 'val':
+            idx = 1
+
+        if which_split == 'train':
+            idx = 0
+        
+        if which_split == 'test':
+            idx = 2
+        
+
+        val_indices = split_indices[idx]
 
         dice_scores = {}
 
@@ -81,7 +110,10 @@ class Evaluator:
 
         return dice_scores
 
-    def evaluate_all_checkpoints(self, apply_postprocess=True):
+    def evaluate_all_checkpoints(self, 
+        apply_postprocess=True,
+        which_split='val'
+    ):
 
         self.print_func("evaluate all checkpoints")
         dice_all = {}
@@ -103,7 +135,11 @@ class Evaluator:
 
         while itr in all_ckpt_iters:
             self.print_func(f"Evaluating checkpoint at {itr} iters")
-            dice_all[itr] = self.evaluate_checkpoint(itr, apply_postprocess)
+            dice_all[itr] = self.evaluate_checkpoint(
+                itr,
+                apply_postprocess,
+                which_split=which_split
+            )
             itr += 3000
 
         return dice_all
