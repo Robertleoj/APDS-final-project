@@ -23,7 +23,8 @@ def model_from_config(config):
         attn_heads=config['attn_heads'],
         attn_head_dim=config['attn_head_dim'],
         n_res_blocks=config['n_res_blocks'],
-        use_self_attention=config['use_self_attention']
+        use_self_attention=config['use_self_attention'],
+        dropout=config['dropout']
     )
 
 def inverse_norm(x,config):

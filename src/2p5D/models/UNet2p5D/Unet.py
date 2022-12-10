@@ -443,7 +443,7 @@ class Unet2p5D(nn.Module):
             attn_heads=attn_heads,
             attn_head_dim=attn_head_dim,
             use_self_attention=use_self_attention,
-            droput=dropout
+            dropout=dropout
         )
 
         self.decoder = Decoder(
