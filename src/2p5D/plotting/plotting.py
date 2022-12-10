@@ -18,6 +18,21 @@ def update_img(idx, im, seg, fig, imgs_t, segmentations):
     fig.canvas.draw_idle()
 
 
+def plot_scan_slice(vol, seg):
+    fig = plt.figure(frameon=False)
+    fig.set_size_inches(15,15)
+
+    ax = plt.Axes(fig, [0., 0., 1., 1.])
+    ax.set_axis_off()
+    fig.add_axes(ax)
+
+    vol_img = vol.unsqueeze(0).permute(1, 2, 0).numpy()
+    seg_img = make_seg_img(seg)
+
+    ax.imshow(vol_img, cmap='gray', aspect="auto")
+    ax.imshow(seg_img, cmap='jet', alpha=0.25, aspect="auto")
+
+    return fig
 
 def make_visual(imgs_t, segmentations):
     fig, ax = plt.subplots(figsize=(10, 10))

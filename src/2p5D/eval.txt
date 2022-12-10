@@ -1,0 +1,48 @@
+
+start
+importing evaluator
+importing from utils
+importing from load_configr
+importing json
+Loading config...
+Loading model...
+Instantiating Evaluator ...
+Starting to evaluate checkpoints
+evaluate all checkpoints
+obtaining all checkpoint iterations
+Starting main for loop
+Evaluating checkpoint at 300 iters
+Total slices = 0
+Total slices = 64
+Total slices = 128
+Total slices = 192
+Total slices = 256
+Total slices = 320
+Total slices = 384
+Total slices = 448
+Total slices = 512
+Total slices = 530
+idx=3 dice_score={'empty': 0.9917104244232178, 'liver': 0.5678160190582275, 'cancer': 0.0}
+Total slices = 0
+Total slices = 64
+Total slices = 128
+Total slices = 192
+Total slices = 256
+Total slices = 320
+Total slices = 384
+Total slices = 448
+Total slices = 512
+Total slices = 576
+Total slices = 640
+Total slices = 667
+idx=97 dice_score={'empty': 0.9909105896949768, 'liver': 0.6013800501823425, 'cancer': 0.0}
+Total slices = 0
+Total slices = 64
+Total slices = 128
+Total slices = 192
+Total slices = 256
+Total slices = 320
+Total slices = 384
+Total slices = 448
+Total slices = 512
+Total slices = 576

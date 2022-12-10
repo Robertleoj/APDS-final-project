@@ -1,8 +1,17 @@
+# robbi
 unzipped_path: /media/bigbrainman/DataDrive/data/LITS17/unzipped
-
 cache_dir: /media/bigbrainman/DataDrive/data/LITS17/cache
+checkpoint_dir: /home/bigbrainman/APDS-final-project/src/2p5D/checkpoints
+train_log_file_iters: /home/bigbrainman/APDS-final-project/src/2p5D/iters_train.csv
+train_log_file_epochs: /home/bigbrainman/APDS-final-project/src/2p5D/epochs_train.csv
 
-zipped_path: /media/bigbrainman/DataDrive/data/LITS17
+# gimli
+#unzipped_path: /home/gimli/APDS-final-project/data/unzipped
+#cache_dir: /home/gimli/APDS-final-project/data/cached
+#checkpoint_dir: /home/gimli/APDS-final-project/src/2p5D/checkpoints
+#train_log_file_iters: /home/gimli/APDS-final-project/src/2p5D/iters_train.csv
+#train_log_file_epochs: /home/gimli/APDS-final-project/src/2p5D/epochs_train.csv
+
 
 split_path: datasets/split.json
 
@@ -11,27 +20,41 @@ split:
   val: 10
   test: 20
 
-slice_number: 5
-
-img_size: 512
-
 clip_lower: -200
 clip_upper: 200
-
-optimizer: adam
 
 n_res_blocks: 2
 
 batch_size: 8
 
+eval_batch_size: 8
+
+dataloader_num_workers: 4
+
 n_classes: 3
+
+n_slices: 5
 
 dim_mults: 
   - 1
   - 2
   - 4
   - 8
-  # - 16
+  - 16
+  - 32
+
+dropout: 0
+
+learning_rate: 0.0001
+
+use_self_attention: True
+
+loss_weights:
+  - 0.1
+  - 0.22
+  - 1
+
+device: cuda
 
 mask_classes:
   empty: 0
@@ -42,3 +65,7 @@ attn_heads: 4
 
 attn_head_dim: 32
 
+log_every_iter: 1
+log_every_epoch: 1
+
+save_every_iter: 300
