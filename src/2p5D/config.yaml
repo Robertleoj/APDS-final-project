@@ -43,9 +43,11 @@ dim_mults:
   - 16
   - 32
 
+dropout: 0.4
+
 learning_rate: 0.0001
 
-use_self_attention: False
+use_self_attention: True
 
 loss_weights:
   - 0.1

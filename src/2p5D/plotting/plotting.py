@@ -18,7 +18,7 @@ def update_img(idx, im, seg, fig, imgs_t, segmentations):
     fig.canvas.draw_idle()
 
 
-def plot_scan_slice(vol, seg, i):
+def plot_scan_slice(vol, seg):
     fig = plt.figure(frameon=False)
     fig.set_size_inches(15,15)
 
@@ -26,8 +26,8 @@ def plot_scan_slice(vol, seg, i):
     ax.set_axis_off()
     fig.add_axes(ax)
 
-    vol_img = vol[i].unsqueeze(0).permute(1, 2, 0).numpy()
-    seg_img = make_seg_img(seg[i])
+    vol_img = vol.unsqueeze(0).permute(1, 2, 0).numpy()
+    seg_img = make_seg_img(seg)
 
     ax.imshow(vol_img, cmap='gray', aspect="auto")
     ax.imshow(seg_img, cmap='jet', alpha=0.25, aspect="auto")

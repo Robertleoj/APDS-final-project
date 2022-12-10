@@ -230,7 +230,12 @@ class ResNetBlock(nn.Module):
         return hidden + x
 
 class BackboneBlock(nn.Module):
-    def __init__(self, *, dim, dim_in=None, n_res_blocks):
+    def __init__(self, *, 
+        dim, 
+        dim_in=None, 
+        n_res_blocks,
+        dropout=0
+    ):
         super().__init__()
 
 
@@ -246,12 +251,20 @@ class BackboneBlock(nn.Module):
         else:
             self.first = None
 
-        self.blocks = nn.Sequential(
-            *[
-                ResNetBlock(dim=dim) 
-                for i in range(n_res_blocks)
-            ]
-        )
+        if dropout == 0:
+            self.blocks = nn.Sequential(
+                *[
+                    ResNetBlock(dim=dim)
+                    for i in range(n_res_blocks)
+                ]
+            )
+        else:
+            self.blocks = nn.Sequential(
+                *[
+                    nn.Sequential(ResNetBlock(dim=dim), nn.Dropout(dropout))
+                    for i in range(n_res_blocks)
+                ]
+            )           
 
     def forward(self, x):
         if self.first is not None:
@@ -271,10 +284,13 @@ class PreNorm(nn.Module):
 
 
 class Encoder(nn.Module):
-    def __init__(self, *, dims, n_res_blocks, 
+    def __init__(self, *, 
+        dims, 
+        n_res_blocks, 
         use_self_attention=False, 
         attn_heads=None, 
-        attn_head_dim=None
+        attn_head_dim=None,
+        dropout=0
     ):
 
         super().__init__()
@@ -288,7 +304,7 @@ class Encoder(nn.Module):
 
         for d, ds in zip(dims, dims[1:]):
 
-            block = BackboneBlock(dim=d, n_res_blocks=n_res_blocks)
+            block = BackboneBlock(dim=d, n_res_blocks=n_res_blocks, dropout=dropout)
             self.bb_blocks.append(block)
 
             if d == dims[0] or use_self_attention is False:
@@ -319,7 +335,14 @@ class Encoder(nn.Module):
 
 
 class Decoder(nn.Module):
-    def __init__(self, *, dims, n_res_blocks, use_self_attention=False, attn_heads=None, attn_head_dim=None):
+    def __init__(self, *, 
+        dims, 
+        n_res_blocks, 
+        use_self_attention=False, 
+        attn_heads=None, 
+        attn_head_dim=None,
+        dropout=0
+    ):
         super().__init__()
 
         assert (use_self_attention is False or attn_heads is not None)
@@ -336,7 +359,7 @@ class Decoder(nn.Module):
             self.upsamples.append(upsample)
 
             block = BackboneBlock(
-                dim=d, dim_in=2 * d, n_res_blocks=n_res_blocks
+                dim=d, dim_in=2 * d, n_res_blocks=n_res_blocks,dropout=dropout
             )
             
             self.bb_blocks.append(block)
@@ -372,12 +395,19 @@ class Decoder(nn.Module):
 
 
 class UNetBottom(nn.Module):
-    def __init__(self, *, dim, n_res_blocks, use_self_attention=False, attn_heads=None, attn_head_dim=None):
+    def __init__(self, *, 
+        dim, 
+        n_res_blocks, 
+        use_self_attention=False, 
+        attn_heads=None, 
+        attn_head_dim=None,
+        dropout=0
+    ):
         super().__init__()
         assert (use_self_attention is False or attn_heads is not None)
 
         self.backbone_block = BackboneBlock(
-            dim=dim, n_res_blocks=n_res_blocks
+            dim=dim, n_res_blocks=n_res_blocks, dropout=dropout
         )
 
         # self.attn = Attention(
@@ -400,7 +430,8 @@ class Unet2p5D(nn.Module):
         attn_heads=None,
         attn_head_dim=None,
         n_res_blocks,
-        use_self_attention=False
+        use_self_attention=False,
+        dropout=0
     ):
         super().__init__()
 
@@ -411,7 +442,8 @@ class Unet2p5D(nn.Module):
             n_res_blocks=n_res_blocks,
             attn_heads=attn_heads,
             attn_head_dim=attn_head_dim,
-            use_self_attention=use_self_attention
+            use_self_attention=use_self_attention,
+            droput=dropout
         )
 
         self.decoder = Decoder(
@@ -419,7 +451,8 @@ class Unet2p5D(nn.Module):
             n_res_blocks=n_res_blocks,
             attn_heads=attn_heads,
             attn_head_dim=attn_head_dim,
-            use_self_attention=use_self_attention
+            use_self_attention=use_self_attention,
+            dropout=dropout
         )
 
         self.bottom = UNetBottom(
@@ -427,7 +460,8 @@ class Unet2p5D(nn.Module):
             n_res_blocks=n_res_blocks,
             attn_head_dim=attn_head_dim,
             attn_heads=attn_heads,
-            use_self_attention=use_self_attention
+            use_self_attention=use_self_attention,
+            dropout=dropout
         )
 
         self.out = nn.Conv2d(dim, n_classes, 1) if dim != n_classes else nn.Identity()
