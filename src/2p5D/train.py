@@ -1,115 +1,20 @@
-import torch
-from torch import optim,nn
-from utils import dice_all
+from datasets import Data
+from load_config import load_config
+from utils import model_from_config
+from trainer.trainer import Trainer
+from sys import argv
 
+config = load_config()
 
+data = Data(config)
 
-def train(*,
-    net: nn.Module, 
-    train_loader, 
-    val_loader, 
-    n_epochs, 
-    device='cuda',
-    optimizer: torch.optim.Optimizer,
-    loss_fn,
-    config
-):
+train_set = data.get_train()
+val_set = data.get_val()
 
-    mask_classes = config['mask_classes']
+net = model_from_config(config)
 
-    train_losses = []
-    train_dice = {k: [] for k in mask_classes.keys()}
-    
-    val_losses = []
-    val_dice = {}
+trainer = Trainer(config=config, net=net, train_set=train_set, val_set=val_set)
 
-    iters = 0
+n_epochs = 5 if len(argv) == 1 else int(argv[1])
 
-    for ep in range(n_epochs):
-
-        ep_train_loss = []
-        ep_train_dice = []
-
-        for X_train, y_train in train_loader:
-            X_train: torch.Tensor
-            y_train: torch.Tensor
-
-
-
-            X_train, y_train = X_train.to(device), y_train.to(device, dtype=torch.long)
-
-            out: torch.Tensor = net(X_train)
-
-            loss: torch.Tensor = loss_fn(out, y_train)
-
-            optimizer.zero_grad()
-
-            loss.backward()
-
-            optimizer.step()
-
-            preds = out.argmax(1)
-            train_d = dice_all(preds.detach().cpu(), y_train.detach().cpu(), mask_classes)
-            ep_train_dice.append(train_d)
-
-            train_l = loss.detach().item()
-            ep_train_loss.append(train_l)
-
-            iters += 1
-            print(f"[Iter {iters}] loss: {train_l} dice: {train_d}")
-
-        train_loss = torch.tensor(ep_train_loss).mean().item()
-        train_die = {}
-        for key in mask_classes.keys():
-            die_mean = torch.tensor([e[key] for e in ep_train_dice]).mean().item()
-            train_die[key] = die_mean
-            train_dice[key].append(die_mean)
-
-        train_losses.append(train_loss)
-
-        print(f"[{ep + 1} / {n_epochs}]")
-        print(f"\ttrain_loss: {train_loss}")
-        print(f"\ttrain_dice: {train_die}")
-
-        
-        # ep_val_loss = []
-        # ep_val_dice = []
-
-        # for X_train, y_train in train_loader:
-        #     X_train: torch.Tensor
-        #     y_train: torch.Tensor
-
-
-
-        #     X_train, y_train = X_train.to(device), y_train.to(device)
-
-        #     out: torch.Tensor = net(X_train)
-
-        #     loss: torch.Tensor = loss_fn(out, y_train)
-
-        #     optimizer.zero_grad()
-
-        #     loss.backward()
-
-        #     optimizer.step()
-
-        #     preds = out.argmax(-1)
-
-        #     ep_train_dice.append(dice_all(preds.detach().cpu(), y_train.detach().cpu()))
-        #     ep_train_loss.append(loss.detach().item())
-
-        # train_loss = torch.tensor(ep_train_loss).mean().item()
-        # train_die = {}
-        # for key in mask_classes.keys():
-        #     die_mean = torch.tensor([e[key] for e in ep_train_dice]).mean().item()
-        #     train_die[key] = die_mean
-        #     train_dice[key].append(die_mean)
-
-        # train_losses.append(train_loss)
-        
-
-
-
-
-
-
+trainer.train()

@@ -51,3 +51,28 @@ check out [this paper](https://www.sciencedirect.com/science/article/pii/S092523
 
 The representation of the model is likely too small to be able to obtain class information about all the classes for each pixel. The last backbone block has a size that is three times as small as the desired output. You need to let the net have a larger representation.
 
+
+Got rid of resizing due to scans in which the liver takes up the whole image 
+
+New Approach: for each slice, concatenate the information of the neighboring slices to the current slice and then predict the segmentation of the middle slice
+
+
+## 2022-12-03:
+Try using two neighboring slices on each side instead of just one
+
+Also add spatial attention instead or along with channel attention. 
+
+How to create gifs with matplotlib:
+[https://towardsdatascience.com/basics-of-gifs-with-pythons-matplotlib-54dd544b6f30]
+
+
+
+# 2022-12-06
+Try increasing the number of slices in the 2.5D
+
+Also try using either SE blocks, or CBAM
+
+
+# 2022-12-08
+Postprocessing:
+* Remove all but the largest connected component of non-zero mask predictions
